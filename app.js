@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 const galleryItems = [
     {
@@ -64,4 +64,65 @@ const galleryItems = [
             'https://cdn.pixabay.com/photo/2019/05/17/04/35/lighthouse-4208843_1280.jpg',
         description: 'Lighthouse Coast Sea',
     },
-];
+]
+
+const galleryList = document.querySelector('.js-gallery');
+const lightBox = document.querySelector('.js-lightbox');
+const lightBoxOverlay = document.querySelector('.lightbox__overlay');
+const lightBoxImg = document.querySelector('.lightbox__image');
+const lightBoxBtnClose = document.querySelector('[data-action="close-lightbox"]');
+
+const createImgInGalleryList = galleryItems.map(({ preview, original, description }) => {
+    return `
+        <li class='gallery__item'>
+            <a class='gallery__link' href='${original}'>
+                <img class='gallery__image' src='${preview}' data-source='${original}' alt='${description}'/>
+            </a>
+        </li>        
+        `
+}).join('');
+
+const onOpenModal = evt => {
+    evt.preventDefault();
+
+    if (evt.target.nodeName !== 'IMG') {
+        return;
+    }
+
+    lightBox.classList.add("is-open");
+    lightBoxImg.src = evt.target.dataset.source;
+    lightBoxImg.alt = evt.target.alt;
+}
+
+const onCloseModal = evt => {
+    if (evt.target.nodeName === 'BUTTON') {
+        removeLightBoxClass();
+    }
+    console.log(evt.target.nodeName);
+}
+
+const onEscapeModalClose = evt => {
+    if (evt.key !== 'Escape') {
+        return;
+    }
+    removeLightBoxClass();
+}
+
+const onOverlayModalClose = evt => {
+    if (evt.currentTarget === evt.target) {
+        removeLightBoxClass();
+    }
+}
+
+const removeLightBoxClass = () => {
+    lightBox.classList.remove("is-open");
+    lightBoxImg.src = '';
+    lightBoxImg.alt = '';
+}
+
+galleryList.insertAdjacentHTML('beforeend', createImgInGalleryList);
+galleryList.addEventListener('click', onOpenModal);
+lightBoxBtnClose.addEventListener('click', onOverlayModalClose);
+window.addEventListener('keydown', onEscapeModalClose);
+lightBoxOverlay.addEventListener('click', onOverlayModalClose);
+
